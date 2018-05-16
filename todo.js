@@ -21,21 +21,20 @@ var todoList = {
 		var totalTodos = this.todos.length;
 		var completedTodos = 0;
 		
-		for(var i = 0; i < this.todos.length; i++) {
-			if(this.todos[i].completed === true) {
-				completedTodos++;
-			}
-		}
-		
-		if(completedTodos === totalTodos) {
-			for(var i = 0; i < this.todos.length; i++) {
-				this.todos[i].completed = false;
-			}
-		} else {
-			for(var i = 0; i < this.todos.length; i++) {
-				this.todos[i].completed = true;
-			}
-		}
+		this.todos.forEach(function(todo) {
+	      if(todo.completed === true) {
+	        completedTodos++;  
+	      }
+	    });
+	    
+	    this.todos.forEach(function(todo) {
+	      if(completedTodos === totalTodos) {
+	         todo.completed = false; 
+	      } else {
+	        todo.completed = true;
+	      }
+	      
+	    });
 		
  	}
 };
@@ -73,26 +72,39 @@ var todoList = {
  };
 
 var view = {
+	initializedTodos: function() {
+		var localS  = localStorage.getItem('todos');
+		if(localS) {
+			 todoList.todos = JSON.parse(localStorage.getItem('todos'));
+			 console.log(todoList.todos);
+		}
+		localStorage.setItem('todos',JSON.stringify(todoList.todos));
+		this.displayTodos();
+			
+	},
   displayTodos: function() {
     var todosUl = document.querySelector('ul');
     todosUl.innerHTML = '';
-    
-    for(var i=0; i<todoList.todos.length; i++) {
+    localStorage.setItem('todos',JSON.stringify(todoList.todos));
+    console.log(JSON.stringify(todoList.todos));
+    console.log(todoList.todos);
+    todoList.todos.forEach(function(todo, position) {
       var todoLi = document.createElement('li');
-      var todo = todoList.todos[i];
       var text = '';
-      
       if(todo.completed === true) {
         text = '(x) ' + todo.todoText;
       } else {
         text = '( ) ' + todo.todoText;
       }
       
-      todoLi.id = i;
+      
+      todoLi.id = position;
       todoLi.textContent = text;
       todoLi.appendChild(this.createDeleteButton());
       todosUl.appendChild(todoLi);
-    }
+    }, this);
+    
+    
   },
   createDeleteButton: function() {
     var deleteButton = document.createElement('button');
@@ -113,7 +125,7 @@ var view = {
     
   }
 };
-
+view.initializedTodos();
 view.setUpEventListeners();
 
  
